@@ -116,4 +116,9 @@ scroll.on('pullDown', function (success, fail) {
   })
 })
 ```
-`'pullUp'`：底部上拉事件。方法同上。
+`'pullUp'`：底部上拉事件。方法同上。<br/><br/>
+5.2 refresh方法<br/><br/>
+手动触发更新，不过大部分情况不需要用到
+```
+scroll.refresh()
+```
