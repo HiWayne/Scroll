@@ -319,7 +319,7 @@ export default class Scroll {
       this._setScrollTransform(this.scrollDistance)
     }
     else {
-      this._kickBack(this.event.pullDown.callback, this.event.pullUp.callback)
+      this._springback(this.event.pullDown.callback, this.event.pullUp.callback)
     }
   }
   //在PC环境下保存鼠标位置的方法
@@ -452,11 +452,11 @@ export default class Scroll {
   }
   //允许滚动到尽头后还能滚动一段距离
   _canEndScroll() {
-    if (this.config && this.config.noEndInertia) return
+    if (this.config && this.config.noSpringback) return
     //限制超出滚动范围后最多只能拉到最外层元素高度的多少，默认是4分之1或100
     else {
-      if (this.config && this.config.endInertia) {
-        let canScrollHeight = this.config.endInertia + ""
+      if (this.config && this.config.endCanMoveDistance) {
+        let canScrollHeight = this.config.endCanMoveDistance + ""
         //兼容小数0.x和.x
         const reg = /^0\.|\./i
         if (reg.test(canScrollHeight)) {
@@ -466,7 +466,7 @@ export default class Scroll {
           this.canScrollHeight = parseFloat(canScrollHeight)
         }
         if (isNaN(this.canScrollHeight)) {
-          throw new Error(`The current endInertia is : "${this.config.endInertia}, it should be number or stringNumber"`)
+          throw new Error(`The current endCanMoveDistance is : "${this.config.endCanMoveDistance}, it should be number or stringNumber"`)
         }
       }
       else {
@@ -506,13 +506,13 @@ export default class Scroll {
   _transitionEndFunction() {
     let _this = this
     return function _tempTransitionEndFunction() {
-      _this._kickBack()
+      _this._springback()
       //移除事件
       _this._removeTransitionEnd(_this._tempTransitionEndFunction)
     }
   }
   //拉到尽头松手回弹
-  _kickBack(...arg) {
+  _springback(...arg) {
     this.childNode.style.transition = "all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)"
     this.childNode.style.webkitTransition = "all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1)"
     //强制浏览器重绘
