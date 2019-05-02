@@ -61,7 +61,7 @@ endCanMoveDistance: undefined —— 拉到尽头时，允许超过尽头的极�
 <script>
 ```
 ### 3. 使用要求
-3.1 滚动元素高度必须大于父元素，否则是没有滚动效果的。
+3.1 滚动元素高度必须大于父元素，否则是没有滚动效果的。<br/><br/>
 3.2 父元素的'overflow'属性必须为'hidden'，否则会报错'The current wrapperNode's overflow is "……", it should be "hidden'。
 ### 4. 随元素节点自动更新
 如果一开始滚动元素的高度小于父元素自然是无法滚动的，后来滚动元素的内容变更了（比如进行了ajax请求），现在它的高度大于父元素，那么这时页面是可以滚动的，无需手动更新。
