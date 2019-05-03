@@ -7,7 +7,7 @@
 ```
 node ../node_modules/http-serve/bin/http-serve
 ```
-请保持你的手机和电脑在同一个网络下，你可以通过输出的网址访问它
+请保持你的手机和电脑在同一个网络下，你可以通过输出的网址访问它（这是我的网址，每个人的不一样）
 ```
 Starting up http-serve for ./
 Available on:
