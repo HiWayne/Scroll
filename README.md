@@ -2,10 +2,18 @@
 ## 查看演示：
 如果你想在PC端查看，请打开/src/index.html，通过开发者工具调成手机模式能获得更好的观感体验<br/>
 如果你想在手机端查看，请先安装node.js<br/>
-接着在cmd命令行中进入Scroll文件夹根目录并运行如下命令<br/>
+接着在cmd命令行中进入Scroll文件夹的src目录并运行如下命令<br/>
 ### view in mobile
 ```
-node node_modules/http-serve/bin/http-serve.js
+node ../node_modules/http-serve/bin/http-serve
+```
+请保持你的手机和电脑在同一个网络下，你可以通过输出的网址访问它
+```
+Starting up http-serve for ./
+Available on:
+  http://192.168.0.102:8080
+  http://127.0.0.1:8080
+Hit CTRL-C to stop the server
 ```
 ### Scroll插件位于
 ```
