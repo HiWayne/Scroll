@@ -4,6 +4,7 @@ import { pullDownEnterHook, pullDownLeaveHook, pullDownRefreshPromise, pullUpLoa
 export default function scrollInit() {
   //Scroll实例
   const scroll = new Scroll("#app")
+  const returnTopButton = document.getElementById('returnTop')
 
   //监听滚动，可以实时获取滚动坐标
   scroll.on('scroll', function (pos) {
@@ -41,4 +42,10 @@ export default function scrollInit() {
       fail()
     })
   })
+
+  //返回顶部按钮
+  returnTopButton.onclick = function () {
+    //滚动到指定目标
+    scroll.scrollTo(0, 400)
+  }
 }

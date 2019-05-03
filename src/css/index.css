@@ -1,0 +1,55 @@
+#app {
+  position: relative;
+  margin-top: 20px;
+  height: 70%;
+  background: #eee;
+  text-align: center;
+  overflow: hidden;
+}
+
+#content-wrapper {
+  position: relative;
+  text-align: center;
+  font-size: 24px;
+  background: rgb(245, 179, 179);
+}
+
+#content {
+  padding: 5px 0;
+}
+
+#top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate3d(0, -100%, 0);
+  width: 100%;
+  font-size: 14px;
+  font-weight: 200;
+}
+
+#bottom {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: translate3d(0, 100%, 0);
+  width: 100%;
+  font-size: 14px;
+  font-weight: 200;
+}
+
+#returnTop {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+#returnTop-text {
+  display: inline-block;
+  transform: scaleX(1.6)
+}

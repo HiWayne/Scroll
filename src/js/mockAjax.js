@@ -1,5 +1,4 @@
-import ajax, { newContentList } from './util.js'
-import contentList from './variable.js'
+import ajax from './util.js'
 
 //模拟ajax请求更新content_wrapper内容
 export function ajaxGetContent() {
@@ -7,14 +6,13 @@ export function ajaxGetContent() {
   //模拟dom异步更新
   setTimeout(() => {
     content_wrapper.innerHTML = `
-    <div id="top" style="position:absolute;left:0;top:0;transform:translate3d(0,-100%,0);width:100%;">上拉刷新</div>
-      <div id="content" style="padding:5px 0;">
+    <div id="top">上拉刷新</div>
+      <div id="content">
       </div>
-    <div id="button" style="position:absolute;left:0;bottom:0;transform:translate3d(0,100%,0);width:100%;">上拉加载更多</div>`
+    <div id="bottom">上拉加载更多</div>`
     //页面回流
     let _reflow = content_wrapper.offsetHeight
     const content = document.getElementById('content')
-    console.log(content)
     ajax(content)
     ajax(content, true)
   }, 5000)
@@ -39,8 +37,6 @@ export function pullDownRefreshPromise() {
   return new Promise(function (resolve) {
     setTimeout(() => {
       topDiv.innerHTML = '已刷新'
-      newContentList = contentList.slice()
-      console.log(newContentList)
       resolve()
       alert('已刷新')
     }, 1000)
@@ -50,12 +46,12 @@ export function pullDownRefreshPromise() {
 //上拉释放加载方法
 export function pullUpLoadPromise() {
   const content = document.getElementById('content')
-  const buttonDiv = document.getElementById('button')
-  buttonDiv.innerHTML = '正在加载……'
+  const bottomDiv = document.getElementById('bottom')
+  bottomDiv.innerHTML = '正在加载……'
   return new Promise(function (resolve) {
     setTimeout(() => {
       ajax(content, true)
-      buttonDiv.innerHTML = '上拉加载'
+      bottomDiv.innerHTML = '上拉加载'
       resolve()
     }, 1000)
   })

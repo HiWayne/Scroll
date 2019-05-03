@@ -128,6 +128,21 @@ export default class Scroll {
       }
     }
   }
+  scrollTo(target, time) {
+    let targetPosition
+    if (target instanceof HTMLElement) {
+      targetPosition = target.offsetTop === 0 ? 0 : -target.offsetTop
+    }
+    else {
+      if (typeof(target) === "number") {
+        targetPosition = target === 0 ? 0 : -target
+      }
+      else if (typeof(target) === "string") {
+        targetPosition = parseFloat(target) === 0 ? 0 : -parseFloat(target)
+      }
+    }
+    this._setScrollTransform(targetPosition, 'y', time)
+  }
   //获取最外层根元素，el参数可以是id或class，也可以直接是元素对象
   _createWrapperElement() {
     //通过id或者class获取元素
@@ -277,11 +292,6 @@ export default class Scroll {
         _this._mouseEvent.mouseDown = false
         _this._savePCMousePosition(['touchEnd'], e)
       }
-      //一次触摸滚动结束重置相关属性
-      _this.touchStart = undefined
-      _this.tempTouchMove = undefined
-      _this.lastTouchMove = undefined
-      _this.currentTouchMove = undefined
       _this._endTouchCallback()
     }
   }
@@ -294,32 +304,38 @@ export default class Scroll {
       this.childNode.style.webkitTransitionTimingFunction = "cubic-bezier(0.23, 1, 0.32, 1)"
       this.childNode.style.transitionDuration = "2500ms"
       this.childNode.style.webkitTransitionDuration = "2500ms"
-      let inertiaDistance = this.onceScrollDistance * 15
+      //手指一次滑动的距离
+      let scrollTouchDistance = Math.abs(this.touchEnd.pageY - this.touchStart.pageY)
+      //手指离开后惯性移动的距离
+      let inertiaDistance = this._caculateInertia(scrollTouchDistance, this.onceScrollDistance)
       this.scrollDistance += inertiaDistance
       if (this.scrollDistance > this.upEnd || this.scrollDistance < this.downEnd) {
         //超出尽头的距离
         let moreDistance
         if (this.scrollDistance > this.upEnd) {
           moreDistance = Math.min(this.scrollDistance - this.upEnd, this.canScrollHeight / 4)
-          this._setScrollTransform(this.upEnd + moreDistance)
+          this._setScrollTransform(this.scrollDistance)
           this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.upEnd + moreDistance, this, (condition) => {
             return condition >= this.upEnd || condition <= this.downEnd
           })
         }
         else if (this.scrollDistance < this.downEnd) {
           moreDistance = Math.max(this.scrollDistance - this.downEnd, -this.canScrollHeight / 4)
-          this._setScrollTransform(this.downEnd + moreDistance)
+          this._setScrollTransform(this.scrollDistance)
           this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.downEnd + moreDistance, this, (condition) => {
             return condition >= this.upEnd || condition <= this.downEnd
           })
         }
         this._listenTransitionEnd(this._transitionEndFunction())
+        this._resetTouchData()
         return
       }
       this._setScrollTransform(this.scrollDistance)
+      this._resetTouchData()
     }
     else {
       this._springback(this.event.pullDown.callback, this.event.pullUp.callback)
+      this._resetTouchData()
     }
   }
   //在PC环境下保存鼠标位置的方法
@@ -652,17 +668,41 @@ export default class Scroll {
     }
   }
   //设置滚动元素transform
-  _setScrollTransform(pos, direction) {
+  _setScrollTransform(pos, direction, time) {
+    if (time) {
+      let transitionTime
+      if (typeof (time) === "number") {
+        transitionTime = time + 'ms'
+      }
+      else if (typeof (time) === "string") {
+        time = time.trim()
+        let reg = /^(\d|\.)+(ms|s)$/
+        if (reg.test(time)) {
+          transitionTime = time
+        }
+        else {
+          throw new Error(`method scrollTo's second parameter is not correct`)
+        }
+      }
+      this.childNode.style.transition = `all ${transitionTime} linear`
+      this.childNode.style.webkitTransition = `all ${transitionTime} linear`
+      this.childNode.style.msTransition = `all ${transitionTime} linear`
+      //强制页面回流
+      let rf = this.childNode.offsetHeight
+    }
     if (typeof (pos) !== 'number') {
       pos = parseFloat(pos)
     }
-    if (!direction || direction === 'y') {
+    if (!direction || direction === 'y' || 'Y') {
       this.childNode.style.transform = `translate3d(0, ${pos}px, 0)`
       this.childNode.style.webkitTransform = `translate3d(0, ${pos}px, 0)`
     }
-    else {
+    else if (direction === 'x' || 'X') {
       this.childNode.style.transform = `translate3d(${pos}px, 0, 0)`
       this.childNode.style.webkitTransform = `translate3d(${pos}px, 0, 0)`
+    }
+    else {
+      throw new Error(`method _setScrollTransform's parameters seem not be correct`)
     }
     this.scrollDistance = pos
     this._listenScrollDistance(this.childNode)
@@ -695,7 +735,7 @@ export default class Scroll {
   }
   //监听滚动坐标时，数字不会受滚动尽头的弹性影响
   _limitNumber(number) {
-    let height =  this._getScrollNodeHeight()- this._getWrapperNodeHeight()
+    let height = this._getScrollNodeHeight() - this._getWrapperNodeHeight()
     if (isNaN(number)) {
       number = parseFloat(number)
       if (isNaN(number)) {
@@ -709,5 +749,17 @@ export default class Scroll {
       number = height
     }
     return number
+  }
+  _caculateInertia(distance, velocity) {
+    let inertiaScale = this.inertiaScale || 15
+    let scale = distance / this.wrapperNodeHeight
+    return velocity * inertiaScale + velocity * inertiaScale * scale
+  }
+  _resetTouchData() {
+    //一次触摸滚动结束重置相关属性
+    this.touchStart = undefined
+    this.tempTouchMove = undefined
+    this.lastTouchMove = undefined
+    this.currentTouchMove = undefined
   }
 }
