@@ -1,6 +1,6 @@
 # Scroll 无滚动条的滚动插件，模拟原生app滚动，支持PC端和手机端，插件可配置部分功能并提供了一些功能性的api
 ## 查看演示：
-如果你想在PC端查看，请打开/src/index.html<br/>
+如果你想在PC端查看，请打开/src/index.html，通过开发者工具调成手机模式能获得更好的观感体验<br/>
 如果你想在手机端查看，请先安装node.js<br/>
 接着在cmd命令行中进入Scroll文件夹根目录并运行如下命令<br/>
 ### view in mobile
