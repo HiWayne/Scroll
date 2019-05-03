@@ -677,8 +677,12 @@ export default class Scroll {
       else if (typeof (time) === "string") {
         time = time.trim()
         let reg = /^(\d|\.)+(ms|s)$/
+        let numReg = /^(\d)+$/
         if (reg.test(time)) {
           transitionTime = time
+        }
+        else if (numReg.test(time)) {
+          transitionTime = time + 'ms'
         }
         else {
           throw new Error(`method scrollTo's second parameter is not correct`)

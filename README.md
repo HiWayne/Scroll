@@ -19,7 +19,7 @@ Hit CTRL-C to stop the server
 ```
 /src/js/Scroll.js
 ```
-### 在项目中引入Scroll插件
+### 在自己的项目中引入Scroll插件
 ```
 import Scroll from 'Scroll.js'
 ```
@@ -74,7 +74,7 @@ endCanMoveDistance: undefined —— 拉到尽头时，允许超过尽头的极�
 ### 4. 随元素节点自动更新
 如果一开始滚动元素的高度小于父元素自然是无法滚动的，后来滚动元素的内容变更了（比如进行了ajax请求），现在它的高度大于父元素，那么这时页面是可以滚动的，无需手动更新。
 ### 5. api
-Scroll类的实例提供了一些外部方法<br/><br/><br/>
+Scroll类的实例提供了一些功能性的api方法<br/><br/><br/>
 5.1 `on`<br/><br/><br/>
 on方法用来监听滚动过程中的一些事件和特殊动作：<br/><br/>
 `'scroll'`：滚动事件。当发生滚动时，调用传入的事件方法，方法的第一个参数是当前滚动的坐标对象，对象的y属性是当前的Y轴移动值(负数)
@@ -124,8 +124,33 @@ scroll.on('pullDown', function (success, fail) {
   })
 })
 ```
-`'pullUp'`：底部上拉事件。方法同上。<br/><br/><br/>
-5.2 refresh方法<br/><br/><br/>
+`'pullUp'`：底部上拉事件。方法同上。<br/>
+使用场景：<br/>
+利用监听scroll，可以做出类似外卖软件中左侧商品和右侧滚动页面联动的功能<br/>
+利用监听特殊动作，可以用来做下拉刷新和下拉加载的功能等等<br/><br/><br/>
+5.2 scrollTo方法<br/><br/><br/>
+scrollTo方法可以让滚动页面在指定时间内滚动到指定位置，它接受两个参数：<br/>
+第一个参数既可以是元素Element，也可以是数字Number或字符串String。如果是元素，则滚动到那个元素所在的位置；如果是数字(例如200)，则滚动到距离顶部200px的位置；如果是'200px'之类的字符串也可以。<br/>
+第二个参数是滚动的时间，可以是数字Number，也可以是字符串String。如果是纯数字，会自动以毫秒ms为单位；如果是字符串，则会以字符串中的单位为时间单位(如'0.3s'，单位就是秒s)；如果字符串中只有数字，依然自动以毫秒ms为单位。
+```
+//随意假设一个滚动元素中的元素，同时假设它在滚动元素中距离顶部200px
+const content = document.getElementById('content')
+
+//我们想某个按钮点击后能在0.4秒内滚动到content元素所在的位置
+scroll.scrollTo(content, 400)
+/*
+或者还可以这样写：
+scroll.scrollTo(200, 400)
+scroll.scrollTo('200px', 400)
+scroll.scrollTo(content, '0.4s')
+scroll.scrollTo(content, '400ms')
+scroll.scrollTo(content, '400')
+*/
+```
+使用场景：<br/>
+利用这个api可以做出类似外卖软件中左侧商品和右侧滚动页面联动的效果<br/>
+也可以做一些前往锚点，返回顶部，前往底部的按钮<br/><br/><br/>
+5.3 refresh方法<br/><br/><br/>
 手动触发更新，不过大部分情况不需要用到
 ```
 scroll.refresh()
