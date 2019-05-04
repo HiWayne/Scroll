@@ -134,10 +134,10 @@ export default class Scroll {
       targetPosition = target.offsetTop === 0 ? 0 : -target.offsetTop
     }
     else {
-      if (typeof(target) === "number") {
+      if (typeof (target) === "number") {
         targetPosition = target === 0 ? 0 : -target
       }
-      else if (typeof(target) === "string") {
+      else if (typeof (target) === "string") {
         targetPosition = parseFloat(target) === 0 ? 0 : -parseFloat(target)
       }
     }
@@ -198,6 +198,11 @@ export default class Scroll {
       }
       e = e || window.event
       e.stopPropagation()
+      //如果禁止click事件被移除了
+      if (!_this._disableClick) {
+        _this._disableClick = true
+        _this._addDisableClickToChildNode()
+      }
       //如果是移动端
       if (_this._isMobile) {
         _this.touchStart = e.changedTouches[0]
@@ -273,96 +278,12 @@ export default class Scroll {
         _this.tempTouchMove.pageX = _this.currentTouchMove.pageX
         _this.tempTouchMove.pageY = _this.currentTouchMove.pageY
       }
+      //表明已经发生过移动了
+      if (!_this._hasMoved) {
+        _this._hasMoved = true
+      }
+      //移动触摸事件的子方法
       _this._scroll()
-    }
-  }
-  //结束触摸的事件方法，注意该方法会被this.el调用而不是实例调用，所以内部的this会指向this.el，这里用闭包将指向实例的this缓存起来。
-  _touchend() {
-    const _this = this
-    return function (e) {
-      if (_this.needMoreHeight) return
-      e = e || window.event
-      e.stopPropagation()
-      //如果是移动端
-      if (_this._isMobile) {
-        _this.touchEnd = e.changedTouches[0]
-      }
-      //如果是PC端
-      else {
-        _this._mouseEvent.mouseDown = false
-        _this._savePCMousePosition(['touchEnd'], e)
-      }
-      _this._endTouchCallback()
-    }
-  }
-  //结束触摸时的事件子方法
-  _endTouchCallback() {
-    if (this.scrollDistance <= this.upEnd && this.scrollDistance >= this.downEnd && this.onceScrollDistance) {
-      if (this.config && this.config.noInertia) return
-      //想要惯性效果，添加缓动函数
-      this.childNode.style.transitionTimingFunction = "cubic-bezier(0.23, 1, 0.32, 1)"
-      this.childNode.style.webkitTransitionTimingFunction = "cubic-bezier(0.23, 1, 0.32, 1)"
-      this.childNode.style.transitionDuration = "2500ms"
-      this.childNode.style.webkitTransitionDuration = "2500ms"
-      //手指一次滑动的距离
-      let scrollTouchDistance = Math.abs(this.touchEnd.pageY - this.touchStart.pageY)
-      //手指离开后惯性移动的距离
-      let inertiaDistance = this._caculateInertia(scrollTouchDistance, this.onceScrollDistance)
-      this.scrollDistance += inertiaDistance
-      if (this.scrollDistance > this.upEnd || this.scrollDistance < this.downEnd) {
-        //超出尽头的距离
-        let moreDistance
-        if (this.scrollDistance > this.upEnd) {
-          moreDistance = Math.min(this.scrollDistance - this.upEnd, this.canScrollHeight / 4)
-          this._setScrollTransform(this.scrollDistance)
-          this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.upEnd + moreDistance, this, (condition) => {
-            return condition >= this.upEnd || condition <= this.downEnd
-          })
-        }
-        else if (this.scrollDistance < this.downEnd) {
-          moreDistance = Math.max(this.scrollDistance - this.downEnd, -this.canScrollHeight / 4)
-          this._setScrollTransform(this.scrollDistance)
-          this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.downEnd + moreDistance, this, (condition) => {
-            return condition >= this.upEnd || condition <= this.downEnd
-          })
-        }
-        this._listenTransitionEnd(this._transitionEndFunction())
-        this._resetTouchData()
-        return
-      }
-      this._setScrollTransform(this.scrollDistance)
-      this._resetTouchData()
-    }
-    else {
-      this._springback(this.event.pullDown.callback, this.event.pullUp.callback)
-      this._resetTouchData()
-    }
-  }
-  //在PC环境下保存鼠标位置的方法
-  _savePCMousePosition(property, event, $this) {
-    if (!this._isObject(this[property])) {
-      if (!$this) {
-        this[property] = {
-          pageX: event.clientX,
-          pageY: event.clientY
-        }
-      }
-      else {
-        $this[property] = {
-          pageX: event.clientX,
-          pageY: event.clientY
-        }
-      }
-    }
-    else {
-      if (!$this) {
-        this[property].pageX = event.clientX
-        this[property].pageY = event.clientY
-      }
-      else {
-        $this[property].pageX = event.clientX
-        $this[property].pageY = event.clientY
-      }
     }
   }
   //滚动方法
@@ -435,6 +356,121 @@ export default class Scroll {
     }
     this.scrollDistance += this.onceScrollDistance
     this._setScrollTransform(this.scrollDistance)
+  }
+  //结束触摸的事件方法，注意该方法会被this.el调用而不是实例调用，所以内部的this会指向this.el，这里用闭包将指向实例的this缓存起来。
+  _touchend() {
+    const _this = this
+    return function (e) {
+      if (_this.needMoreHeight) return
+      e = e || window.event
+      e.stopPropagation()
+      if (!_this._hasMoved) {
+        _this._removeDisableClickFromChildNode()
+        _this._disableClick = undefined
+      }
+      //如果是移动端
+      if (_this._isMobile) {
+        _this.touchEnd = e.changedTouches[0]
+      }
+      //如果是PC端
+      else {
+        _this._mouseEvent.mouseDown = false
+        _this._savePCMousePosition(['touchEnd'], e)
+      }
+      _this._hasMoved = undefined
+      _this._endTouchCallback()
+    }
+  }
+  //结束触摸时的事件子方法
+  _endTouchCallback() {
+    if (this.scrollDistance <= this.upEnd && this.scrollDistance >= this.downEnd && this.onceScrollDistance) {
+      if (this.config && this.config.noInertia) return
+      //想要惯性效果，添加缓动函数
+      this.childNode.style.transitionTimingFunction = "cubic-bezier(0.23, 1, 0.32, 1)"
+      this.childNode.style.webkitTransitionTimingFunction = "cubic-bezier(0.23, 1, 0.32, 1)"
+      this.childNode.style.transitionDuration = "2500ms"
+      this.childNode.style.webkitTransitionDuration = "2500ms"
+      //手指一次滑动的距离
+      let scrollTouchDistance = Math.abs(this.touchEnd.pageY - this.touchStart.pageY)
+      //手指离开后惯性移动的距离
+      let inertiaDistance = this._caculateInertia(scrollTouchDistance, this.onceScrollDistance)
+      this.scrollDistance += inertiaDistance
+      if (this.scrollDistance > this.upEnd || this.scrollDistance < this.downEnd) {
+        //超出尽头的距离
+        let moreDistance
+        if (this.scrollDistance > this.upEnd) {
+          moreDistance = Math.min(this.scrollDistance - this.upEnd, this.canScrollHeight / 4)
+          this._setScrollTransform(this.scrollDistance)
+          this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.upEnd + moreDistance, this, (condition) => {
+            return condition >= this.upEnd || condition <= this.downEnd
+          })
+        }
+        else if (this.scrollDistance < this.downEnd) {
+          moreDistance = Math.max(this.scrollDistance - this.downEnd, -this.canScrollHeight / 4)
+          this._setScrollTransform(this.scrollDistance)
+          this._addListenScrollDistance(this._endEndInertiaTimeFunction, this.downEnd + moreDistance, this, (condition) => {
+            return condition >= this.upEnd || condition <= this.downEnd
+          })
+        }
+        this._listenTransitionEnd(this._transitionEndFunction())
+        this._resetTouchData()
+        return
+      }
+      this._setScrollTransform(this.scrollDistance)
+      this._resetTouchData()
+    }
+    else {
+      this._springback(this.event.pullDown.callback, this.event.pullUp.callback)
+      this._resetTouchData()
+    }
+  }
+  //添加禁止click事件
+  _addDisableClickToChildNode() {
+    this.eventListener(this.childNode, 'click', this._disableClick)
+  }
+  //移除禁止click事件
+  _removeDisableClickFromChildNode() {
+    this.removeEvent(this.childNode, 'click', this._disableClick)
+  }
+  //禁止click事件
+  _disableClick(e) {
+    e = e || window.event
+    let target = e.target
+    e.preventDefault()
+    e.stopPropagation()
+    target.onclick = function () {
+      target.onclick = null
+    }
+    this.onclick = function () {
+      target.onclick = null
+    }
+  }
+  //在PC环境下保存鼠标位置的方法
+  _savePCMousePosition(property, event, $this) {
+    if (!this._isObject(this[property])) {
+      if (!$this) {
+        this[property] = {
+          pageX: event.clientX,
+          pageY: event.clientY
+        }
+      }
+      else {
+        $this[property] = {
+          pageX: event.clientX,
+          pageY: event.clientY
+        }
+      }
+    }
+    else {
+      if (!$this) {
+        this[property].pageX = event.clientX
+        this[property].pageY = event.clientY
+      }
+      else {
+        $this[property].pageX = event.clientX
+        $this[property].pageY = event.clientY
+      }
+    }
   }
   //滚动到尽头时执行的方法
   _endScrollMove(computeNextScrollDistance) {
