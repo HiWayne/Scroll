@@ -173,14 +173,14 @@ export default class Scroll {
   //向this.childNode注册触摸事件
   _addScrollEvent() {
     if (this.isMobile()) {
-      this.eventListener(this.childNode, 'touchstart', this._touchstart())
-      this.eventListener(this.childNode, 'touchmove', this._touchmove())
-      this.eventListener(this.childNode, 'touchend', this._touchend())
+      this.eventListener(this.childNode, 'touchstart', this._touchstart(), {passive: false})
+      this.eventListener(this.childNode, 'touchmove', this._touchmove(), {passive: false})
+      this.eventListener(this.childNode, 'touchend', this._touchend(), {passive: false})
     }
     else {
-      this.eventListener(this.childNode, 'mousedown', this._touchstart())
-      this.eventListener(this.childNode, 'mousemove', this._touchmove())
-      this.eventListener(this.childNode, 'mouseup', this._touchend())
+      this.eventListener(this.childNode, 'mousedown', this._touchstart(), {passive: false})
+      this.eventListener(this.childNode, 'mousemove', this._touchmove(), {passive: false})
+      this.eventListener(this.childNode, 'mouseup', this._touchend(), {passive: false})
     }
   }
   //开始触摸的事件方法，注意该方法会被this.el调用而不是实例调用，所以内部的this会指向this.el，这里利用闭包将指向实例的this缓存起来。
@@ -752,9 +752,10 @@ export default class Scroll {
     return Object.prototype.toString.call(object) === "[object Object]"
   }
   //事件监听兼容写法
-  eventListener(node, eventName, fn, useCapture) {
+  eventListener(node, eventName, fn, option) {
     if (window.addEventListener) {
-      node.addEventListener(eventName, fn, useCapture)
+      //新的event标准第三个参数可以是对象了
+      node.addEventListener(eventName, fn, option)
     }
     else {
       node.attachEvent('on' + eventName, fn)
