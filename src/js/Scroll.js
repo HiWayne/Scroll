@@ -197,6 +197,7 @@ export default class Scroll {
         _this.needMoreHeight = undefined
       }
       e = e || window.event
+      e.preventDefault()
       e.stopPropagation()
       //如果是移动端
       if (_this._isMobile) {
@@ -272,10 +273,10 @@ export default class Scroll {
         }
         _this.tempTouchMove.pageX = _this.currentTouchMove.pageX
         _this.tempTouchMove.pageY = _this.currentTouchMove.pageY
-      }
-      //表明已经发生过移动了
-      if (!_this._hasMoved) {
-        _this._hasMoved = true
+        //表明已经发生过移动了
+        if (!_this._hasMoved) {
+          _this._hasMoved = true
+        }
       }
       //移动触摸事件的子方法
       _this._scroll()
@@ -358,6 +359,7 @@ export default class Scroll {
     return function (e) {
       if (_this.needMoreHeight) return
       e = e || window.event
+      e.preventDefault()
       e.stopPropagation()
       //如果是移动端
       if (_this._isMobile) {
@@ -762,7 +764,7 @@ export default class Scroll {
     return number
   }
   _caculateInertia(distance, velocity) {
-    let inertiaScale = this.inertiaScale || 15
+    let inertiaScale = this.inertiaScale || 20
     let scale = distance / this.wrapperNodeHeight
     return velocity * inertiaScale + velocity * inertiaScale * scale
   }
