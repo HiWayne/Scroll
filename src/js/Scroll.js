@@ -198,11 +198,6 @@ export default class Scroll {
       }
       e = e || window.event
       e.stopPropagation()
-      //如果禁止click事件被移除了
-      if (!_this._disableClick) {
-        _this._disableClick = true
-        _this._addDisableClickToChildNode()
-      }
       //如果是移动端
       if (_this._isMobile) {
         _this.touchStart = e.changedTouches[0]
@@ -364,10 +359,6 @@ export default class Scroll {
       if (_this.needMoreHeight) return
       e = e || window.event
       e.stopPropagation()
-      if (!_this._hasMoved) {
-        _this._removeDisableClickFromChildNode()
-        _this._disableClick = undefined
-      }
       //如果是移动端
       if (_this._isMobile) {
         _this.touchEnd = e.changedTouches[0]
@@ -422,27 +413,6 @@ export default class Scroll {
     else {
       this._springback(this.event.pullDown.callback, this.event.pullUp.callback)
       this._resetTouchData()
-    }
-  }
-  //添加禁止click事件
-  _addDisableClickToChildNode() {
-    this.eventListener(this.childNode, 'click', this._disableClick)
-  }
-  //移除禁止click事件
-  _removeDisableClickFromChildNode() {
-    this.removeEvent(this.childNode, 'click', this._disableClick)
-  }
-  //禁止click事件
-  _disableClick(e) {
-    e = e || window.event
-    let target = e.target
-    e.preventDefault()
-    e.stopPropagation()
-    target.onclick = function () {
-      target.onclick = null
-    }
-    this.onclick = function () {
-      target.onclick = null
     }
   }
   //在PC环境下保存鼠标位置的方法
