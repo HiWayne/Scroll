@@ -3,19 +3,41 @@
   margin-top: 20px;
   height: 70%;
   background: #eee;
-  text-align: center;
   overflow: hidden;
 }
 
 #content-wrapper {
   position: relative;
-  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
   font-size: 24px;
-  background: rgb(245, 179, 179);
+  background: rgb(248, 229, 235);
+}
+
+#countDistance {
+  position: absolute;
+  top: 40px;
+  left: 15px;
+  z-index: 10;
+  padding: 5px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f8f8f8;
+  color: #42b983;
 }
 
 #content {
   padding: 5px 0;
+  max-width: 60%;
+}
+
+#content>h3 {
+  font-weight: 700;
+  color: rgb(135, 171, 148);
 }
 
 #top {
@@ -23,6 +45,7 @@
   left: 0;
   top: 0;
   transform: translate3d(0, -100%, 0);
+  text-align: center;
   width: 100%;
   font-size: 14px;
   font-weight: 200;
@@ -33,6 +56,7 @@
   left: 0;
   bottom: 0;
   transform: translate3d(0, 100%, 0);
+  text-align: center;
   width: 100%;
   font-size: 14px;
   font-weight: 200;
@@ -40,8 +64,9 @@
 
 #returnTop {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  bottom: 15px;
+  left: 15px;
+  text-align: center;
   width: 20px;
   height: 20px;
   background: rgba(255, 255, 255, 0.6);
@@ -51,5 +76,9 @@
 
 #returnTop-text {
   display: inline-block;
-  transform: scaleX(1.6)
+  transform: scaleX(1.6);
+  width: 20px;
+  line-height: 20px;
+  font-size: 14px;
+  font-weight: 300;
 }

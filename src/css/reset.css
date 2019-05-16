@@ -28,11 +28,13 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section 
 body {
     height: 100%;
     line-height: 1.5;
+    font-size: 16px;
     font-family: 'Pingfang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif;
     -webkit-user-select:none;
     -moz-user-select:none;
     -ms-user-select:none;
     user-select:none;
+    color: #555;
 }
 
 .clearfix {

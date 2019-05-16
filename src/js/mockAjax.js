@@ -3,6 +3,7 @@ import ajax from './util.js'
 //模拟ajax请求更新content_wrapper内容
 export function ajaxGetContent() {
   const content_wrapper = document.getElementById('content-wrapper')
+
   //模拟dom异步更新
   setTimeout(() => {
     content_wrapper.innerHTML = `
@@ -12,30 +13,36 @@ export function ajaxGetContent() {
     <div id="bottom">上拉加载更多</div>`
     //页面回流
     let _reflow = content_wrapper.offsetHeight
+
     const content = document.getElementById('content')
-    ajax(content)
-    ajax(content, true)
+
+    ajax(content, 3)
   }, 5000)
 }
 
 //刚开始下拉时(pos.y大于0)执行的方法
 export function pullDownEnterHook() {
   const topDiv = document.getElementById('top')
+
   topDiv.innerHTML = '松手刷新'
 }
 
 //刚离开下拉时(pos.y小于0或下拉被释放)执行的方法
 export function pullDownLeaveHook() {
   const topDiv = document.getElementById('top')
+
   topDiv.innerHTML = '上拉刷新'
 }
 
 //下拉释放刷新方法
 export function pullDownRefreshPromise() {
   const topDiv = document.getElementById('top')
+  const content = document.getElementById('content')
+
   topDiv.innerHTML = '正在刷新……'
   return new Promise(function (resolve) {
     setTimeout(() => {
+      ajax(content, 3, true)
       topDiv.innerHTML = '已刷新'
       resolve()
       alert('已刷新')
